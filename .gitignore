@@ -1,0 +1,55 @@
+# ===== Dependencies =====
+node_modules/
+.pnpm-store/
+
+# ===== Build output (tsup → dist) =====
+dist/
+build/
+out/
+
+# TypeScript incremental build cache & artifacts
+*.tsbuildinfo
+
+# ===== Logs (MCP server writes logs to stderr, but guard any stray files) =====
+*.log
+logs/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===== Environment & secrets =====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ===== Local config / runtime data =====
+# CyberQuant config lives in ~/.cyberquant/config.json, outside the repo.
+# Guard against any local-only config or cache dropped in-tree.
+*.local
+.cache/
+
+# ===== Test & coverage =====
+coverage/
+.nyc_output/
+
+# ===== IDE / Editor =====
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+*.swp
+*.swo
+*~
+
+# ===== OS files =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Misc =====
+*.tgz
+*.tar.gz
