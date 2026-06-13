@@ -34,6 +34,15 @@ function formatRoute(route: RouteInfo): string {
   return lines.join('\n');
 }
 
+/** 通用参数传值格式说明（按参数 type，所有路由共用） */
+const PARAM_FORMAT_GUIDE = [
+  '通用传值格式（按参数 type）：',
+  '- string：单值 key=v；多值用逗号 key=v1,v2,v3（≤100）或 URL 数组 key=v1&key=v2',
+  '- number：单值 key=1；多值用逗号 key=1,5,30（≤100 项）',
+  '- date：单值 key=yyyy-MM-dd；范围 key=d1&key=d2（>= AND <=）；同时支持 yyyy-MM-dd HH:mm:ss',
+  '数组/范围请传 JS 数组，逗号分隔则传字符串。',
+].join('\n');
+
 export function registerListRoutesTool(server: McpServer, state: ServerState): void {
   server.tool(
     'list_routes',
@@ -63,12 +72,13 @@ export function registerListRoutesTool(server: McpServer, state: ServerState): v
 
         const header = `可用数据路由（共 ${total} 个）：\n`;
         const body = routes.map(formatRoute).join('\n\n');
+        const guide = total > 0 ? `\n\n${PARAM_FORMAT_GUIDE}` : '';
         const footer = total > 0
           ? '\n\n使用 query_data 工具查询指定路由的数据，传入 routeSlug 和查询参数。'
           : '';
 
         return {
-          content: [{ type: 'text' as const, text: header + body + footer }],
+          content: [{ type: 'text' as const, text: header + body + guide + footer }],
         };
       } catch (err) {
         const msg = err instanceof Error ? err.message : '未知错误';

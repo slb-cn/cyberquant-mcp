@@ -1,6 +1,67 @@
 # 使用示例
 
-以下是与 CyberQuant MCP Server 交互的典型场景示例。
+以下是与 CyberQuant MCP Server 交互的典型场景示例。首次使用请先完成下方「快速上手」的安装与配置。
+
+## 快速上手：安装与配置（首次使用 MCP）
+
+本服务是一个 MCP（Model Context Protocol）Server，需接入 MCP 客户端（如 Claude Desktop）后，由 AI 调用其工具来查询数据。下面以 Claude Desktop 为例，说明从安装到首次查询的完整流程。
+
+### 1. 前置条件
+
+- 已安装 **Node.js ≥ 20.0.0**（终端执行 `node -v` 检查；客户端会通过 `npx` 自动拉起本服务，无需手动安装）
+- 已拥有 CyberQuant 平台的 **API Key**（格式为 `sk_live_xxx` 或 `sk_test_xxx`）
+
+### 2. 在 Claude Desktop 中接入
+
+编辑 Claude Desktop 配置文件：
+
+- macOS：`~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows：`%APPDATA%\Claude\claude_desktop_config.json`
+
+添加 `cyberquant` 服务：
+
+```json
+{
+  "mcpServers": {
+    "cyberquant": {
+      "command": "npx",
+      "args": ["-y", "cyberquant-mcp"]
+    }
+  }
+}
+```
+
+保存后**重启 Claude Desktop**，即可在对话中使用本服务提供的工具。
+
+### 3. 配置 API Key
+
+任选其一：
+
+**方式 A：在对话中配置（推荐，见下方「场景一」）**
+连接后直接告诉 Claude 你的 API Key，它会调用 `configure` 工具自动写入配置。
+
+**方式 B：手动编辑配置文件**
+创建并编辑 `~/.cyberquant/config.json`（与 cyberquant-cli 共用）：
+
+```json
+{
+  "endpoint": "https://api.cyberspace2077.com",
+  "apiKey": "sk_live_你的APIKey",
+  "mcp": {
+    "pageSize": 200,
+    "timeout": 30000
+  }
+}
+```
+
+字段说明：
+- `endpoint`：API Gateway 地址，默认 `https://api.cyberspace2077.com`，可自定义
+- `mcp.pageSize`：单次查询返回条数，默认 200，**上限 1000**（超过将返回警告且不发起请求）
+- `mcp.timeout`：单次请求超时（毫秒），默认 30000（30 秒）
+
+### 4. 验证
+
+在 Claude Desktop 中询问「你们平台有哪些数据路由」，若返回路由列表即接入成功，完整流程见下方「场景一」。
 
 ---
 

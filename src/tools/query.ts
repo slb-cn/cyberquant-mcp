@@ -54,7 +54,14 @@ export function registerQueryDataTool(server: McpServer, state: ServerState): vo
       params: z
         .record(z.union([z.string(), z.number(), z.boolean(), z.array(z.union([z.string(), z.number()]))]))
         .optional()
-        .describe('查询参数，键值对透传给 API。具体参数参考 list_routes 返回的路由说明。'),
+        .describe([
+          '查询参数，键值对透传给 API。具体参数参考 list_routes 返回的路由说明。',
+          '传值格式按参数 type 而定：',
+          '- string：单值 key=v；多值用逗号 key=v1,v2,v3（≤100 项）或 URL 数组 key=v1&key=v2',
+          '- number：单值 key=1；多值用逗号 key=1,5,30（≤100 项）',
+          '- date：单值 key=2026-05-01；范围 key=2026-05-01&key=2026-05-07（语义 >= AND <=）；支持 yyyy-MM-dd 与 yyyy-MM-dd HH:mm:ss 两种格式',
+          '（多值/范围请传 JS 数组，底层会展开为重复 key；逗号分隔则传字符串）',
+        ].join('\n')),
     },
     async ({ routeSlug, params }) => {
       if (!state.client || !state.config) {
