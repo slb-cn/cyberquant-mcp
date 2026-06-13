@@ -41,6 +41,29 @@
    - macOS：`~/Library/Logs/Claude/mcp*.log`
    - 在日志中搜索 `cyberquant` 关键词
 
+### 客户端集成相关
+
+**Q：配置文件修改后不生效？**
+
+完全退出 Claude Desktop（不是最小化），然后重新打开。
+
+**Q：macOS 提示"无法验证开发者"或应用被隔离？**
+
+```bash
+# 移除 Node.js 的隔离属性
+xattr -cr $(which node)
+```
+
+**Q：Windows 上路径报错？**
+
+JSON 配置中的路径使用正斜杠 `/` 或双反斜杠 `\\`：
+
+```json
+{
+  "args": ["C:/Users/yourname/projects/cyberquant-mcp/dist/index.js"]
+}
+```
+
 ---
 
 ## 配置问题

@@ -53,3 +53,5 @@ desktop.ini
 # ===== Misc =====
 *.tgz
 *.tar.gz
+
+.claude
