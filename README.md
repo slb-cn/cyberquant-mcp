@@ -10,12 +10,13 @@ CyberQuant 数据共享平台的 MCP（Model Context Protocol）服务器，让 
 
 ## 功能特性
 
-### MCP Tools（3 个）
+### MCP Tools（4 个）
 
 | 工具 | 说明 |
 |------|------|
 | `configure` | 配置 API Key，首次使用时调用 |
-| `list_routes` | 列出当前用户可用的数据路由及参数 Schema |
+| `list_routes` | 列出当前用户可用的数据路由**目录**（仅元信息，不含入参/返回字段） |
+| `get_route_detail` | 查询单个路由的入参/返回字段详情，由大模型据此自行组织 `query_data` 参数 |
 | `query_data` | 查询指定路由数据，返回 **CSV 格式**（节省 token） |
 
 ### MCP Resources（2 个）
@@ -28,6 +29,7 @@ CyberQuant 数据共享平台的 MCP（Model Context Protocol）服务器，让 
 ### 设计亮点
 
 - **CSV 输出**：相比 JSON 节省 40–60% token，表格结构天然适合 AI 分析
+- **路由目录 + 按需详情**：`list_routes` 仅输出目录级元信息，`get_route_detail` 按需取详情，避免上百路由全量入参一次性占满上下文（路由列表内存缓存 2 分钟，list→detail 连贯调用零重复网络）
 - **自然语言引导**：数据返回附带提示，引导 AI 缩小查询范围而非暴力翻页
 - **pageSize 上限保护**：超过 1000 条自动拦截，避免 AI 处理超大数据集
 - **运行时配置**：通过 `configure` 工具动态更新 API Key，无需重启
@@ -85,7 +87,7 @@ MCP Server 与 `cyberquant-cli` 共用配置文件 `~/.cyberquant/config.json`�
 帮我查一下平安银行最近一周的日K线数据
 ```
 
-AI 会依次调用 `list_routes` → `query_data`，并以表格形式返回分析结果。更多场景见 [使用示例](./examples/usage-examples.md)。
+AI 会依次调用 `list_routes` → `get_route_detail` → `query_data`，并以表格形式返回分析结果。更多场景见 [使用示例](./examples/usage-examples.md)。
 
 ## 文档
 

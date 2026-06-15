@@ -6,6 +6,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { ServerState } from './lib/state.js';
 import { registerConfigureTool } from './tools/configure.js';
 import { registerListRoutesTool } from './tools/list.js';
+import { registerGetRouteDetailTool } from './tools/detail.js';
 import { registerQueryDataTool } from './tools/query.js';
 import { createUserProfileResource } from './resources/user-profile.js';
 import { createRouteListResource } from './resources/route-list.js';
@@ -19,6 +20,7 @@ export function createServer(state: ServerState): McpServer {
   // 注册 Tools
   registerConfigureTool(server, state);
   registerListRoutesTool(server, state);
+  registerGetRouteDetailTool(server, state);
   registerQueryDataTool(server, state);
 
   // 注册 Resources

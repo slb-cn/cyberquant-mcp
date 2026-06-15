@@ -136,7 +136,7 @@ chmod 644 ~/.cyberquant/config.json
 
 **解决方案**：
 1. 调用 `list_routes` 查看所有可用路由
-2. 确认使用正确的 `routeSlug` 值
+2. 确认使用正确的 `routeSlug` 值，必要时再调用 `get_route_detail` 看入参/返回字段
 
 ### Rate limit exceeded（429）
 
@@ -198,7 +198,7 @@ chmod 644 ~/.cyberquant/config.json
 3. 用户权限不包含该市场
 
 **解决方案**：
-1. 调用 `list_routes` 确认路由参数说明
+1. 调用 `get_route_detail(routeSlug=...)` 确认路由的入参与返回字段
 2. 检查参数格式是否正确
 3. 读取 `cyberquant://user/profile` 确认市场权限
 

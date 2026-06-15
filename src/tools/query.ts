@@ -43,25 +43,18 @@ const HAS_MORE_HINT =
 
 /** 无数据提示 */
 const NO_DATA_HINT =
-  '未查询到符合条件的数据。请检查查询参数是否正确，可通过 list_routes 工具查看该路由支持的参数说明。';
+  '未查询到符合条件的数据。请检查查询参数是否正确，可通过 get_route_detail 工具查看该路由支持的参数说明。';
 
 export function registerQueryDataTool(server: McpServer, state: ServerState): void {
   server.tool(
     'query_data',
-    '查询指定路由的数据，返回 CSV 格式。使用 list_routes 查看可用路由和参数说明。',
+    '查询指定路由的数据，返回 CSV 格式。先用 list_routes 找路由，再用 get_route_detail 获取入参/返回字段说明，最后调用本工具查询。',
     {
       routeSlug: z.string().describe('路由标识，如 "daily-stock"。通过 list_routes 获取可用路由。'),
       params: z
         .record(z.union([z.string(), z.number(), z.boolean(), z.array(z.union([z.string(), z.number()]))]))
         .optional()
-        .describe([
-          '查询参数，键值对透传给 API。具体参数参考 list_routes 返回的路由说明。',
-          '传值格式按参数 type 而定：',
-          '- string：单值 key=v；多值用逗号 key=v1,v2,v3（≤100 项）或 URL 数组 key=v1&key=v2',
-          '- number：单值 key=1；多值用逗号 key=1,5,30（≤100 项）',
-          '- date：单值 key=2026-05-01；范围 key=2026-05-01&key=2026-05-07（语义 >= AND <=）；支持 yyyy-MM-dd 与 yyyy-MM-dd HH:mm:ss 两种格式',
-          '（多值/范围请传 JS 数组，底层会展开为重复 key；逗号分隔则传字符串）',
-        ].join('\n')),
+        .describe('查询参数，键值对透传给 API。具体参数与传值格式请先调用 get_route_detail(routeSlug) 获取，再据此组织本对象。'),
     },
     async ({ routeSlug, params }) => {
       if (!state.client || !state.config) {

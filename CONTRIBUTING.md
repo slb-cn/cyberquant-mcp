@@ -30,7 +30,8 @@ cyberquant-mcp/
 │   ├── server.ts             # MCP 服务器（注册 Tools + Resources）
 │   ├── tools/
 │   │   ├── configure.ts      # configure — 配置 API Key
-│   │   ├── list.ts           # list_routes — 列出可用路由
+│   │   ├── list.ts           # list_routes — 路由目录（仅元信息）
+│   │   ├── detail.ts         # get_route_detail — 单路由入参/返回字段详情
 │   │   └── query.ts          # query_data — CSV 数据查询
 │   ├── resources/
 │   │   ├── user-profile.ts   # cyberquant://user/profile

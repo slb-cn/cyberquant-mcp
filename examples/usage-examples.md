@@ -169,6 +169,6 @@ Claude：沪深300指数（000300.SH）2024年第一季度共 59 个交易日数
 ## 提示
 
 - 首次使用时，AI 会自动引导你完成 `configure` 配置
-- 查询数据前，AI 通常会先调用 `list_routes` 了解可用路由
+- 查询数据前，AI 通常会依次调用 `list_routes`（找路由）→ `get_route_detail`（看入参/返回字段）→ `query_data`（取数据）
 - 当数据量过大时，AI 会建议缩小查询范围（推荐单次 50–200 条）
 - 常见错误处理见 [故障排查](../docs/troubleshooting.md)

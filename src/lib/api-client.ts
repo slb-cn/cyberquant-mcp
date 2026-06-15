@@ -11,10 +11,22 @@ import type {
 } from '../types/index.js';
 import { mapApiError } from './errors.js';
 
+/** 路由列表缓存 TTL（进程内、实例级）
+ *
+ * 覆盖典型链路：list_routes → 大模型读元信息并挑选路由 → get_route_detail。
+ * 2 分钟足以容纳网络/模型慢的真实节奏，且路由元数据陈旧风险可忽略。
+ */
+const ROUTES_CACHE_TTL_MS = 120_000;
+
+type RoutesResponse = ApiResponse<RouteInfo[]> & { meta?: RouteListMeta };
+
 export class ApiClient {
   private readonly endpoint: string;
   private readonly apiKey: string;
   private readonly timeout: number;
+
+  /** 路由列表内存缓存（仅成功响应才回填，失败不污染） */
+  private routesCache: { data: RoutesResponse; expiresAt: number } | null = null;
 
   constructor(config: AppConfig) {
     this.endpoint = config.endpoint;
@@ -73,9 +85,20 @@ export class ApiClient {
     return this.request('/api/v1/me');
   }
 
-  /** 获取可用路由列表 */
-  async listRoutes(): Promise<ApiResponse<RouteInfo[]> & { meta?: RouteListMeta }> {
-    return this.request('/api/v1/api-list');
+  /** 获取可用路由列表（命中 2 分钟内存缓存时零网络） */
+  async listRoutes(): Promise<RoutesResponse> {
+    const now = Date.now();
+    if (this.routesCache && now < this.routesCache.expiresAt) {
+      return this.routesCache.data;
+    }
+
+    const res = await this.request<RoutesResponse>('/api/v1/api-list');
+
+    // 仅成功响应才写缓存，错误响应原样透传给上层处理
+    if (res.success) {
+      this.routesCache = { data: res, expiresAt: now + ROUTES_CACHE_TTL_MS };
+    }
+    return res;
   }
 
   /** 查询数据 */

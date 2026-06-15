@@ -1,6 +1,8 @@
 # 工具说明（MCP Tools）
 
-MCP Server 提供三个工具（Tool），AI 可以主动调用这些工具来完成任务。
+MCP Server 提供四个工具（Tool），AI 可以主动调用这些工具来完成任务。
+
+典型调用流程：`configure`（首次） → `list_routes`（找路由） → `get_route_detail`（看入参/返回） → `query_data`（取数据）。
 
 ---
 
@@ -41,9 +43,9 @@ MCP Server 提供三个工具（Tool），AI 可以主动调用这些工具来�
 
 ---
 
-## 2. list_routes — 列出可用数据路由
+## 2. list_routes — 列出可用路由（仅目录）
 
-查询当前用户可用的所有数据路由，包含每个路由的查询参数和返回字段说明。
+列出当前用户可用的路由**目录级元信息**：`routeSlug`、显示名、说明、分类。**不含**入参/返回字段——避免上百个路由的全量参数一次性占满上下文。
 
 ### 参数
 
@@ -51,42 +53,84 @@ MCP Server 提供三个工具（Tool），AI 可以主动调用这些工具来�
 
 ### 调用接口
 
-`GET /api/v1/api-list`
+`GET /api/v1/api-list`（结果在 MCP Server 内存缓存 2 分钟，list→detail 连贯调用零重复网络）
 
 ### 返回示例
 
 ```
-可用数据路由（共 5 个）：
+可用数据路由（共 32 个）：
 
 【日K线数据】routeSlug: daily-stock
 说明：股票日线行情数据，包含开盘价、收盘价、最高价、最低价、成交量等
 分类：股票行情
-查询参数：
-  - tradeDate (date, 可选): 交易日期，格式 YYYY-MM-DD
-  - symbol (string, 可选): 股票代码，如 000001.SZ
-  - startDate (date, 可选): 开始日期
-  - endDate (date, 可选): 结束日期
-返回字段：
-  - tradeDate (string): 交易日期
-  - symbol (string): 股票代码
-  - open (number): 开盘价
-  - high (number): 最高价
-  - low (number): 最低价
-  - close (number): 收盘价
-  - volume (number): 成交量
 
-使用 query_data 工具查询指定路由的数据，传入 routeSlug 和查询参数。
+【分钟线】routeSlug: minute-stock
+说明：股票分钟级行情数据
+分类：股票行情
+
+...
+
+以上为路由目录，**不含入参/返回字段详情**。
+请按以下流程操作：
+1. 调用 get_route_detail(routeSlug="...") 获取目标路由的查询参数与返回字段说明
+2. 根据 get_route_detail 返回的参数说明与传值格式，自行组织 params 后调用 query_data 查询数据
 ```
 
 ### 何时使用
 
-- 首次使用时了解有哪些可用数据
-- 查询数据前确认路由名称（`routeSlug`）和参数格式
-- 不确定某个参数名称或类型时
+- 首次使用时浏览有哪些可用数据
+- 不确定某类数据对应的 `routeSlug` 时
 
 ---
 
-## 3. query_data — 查询数据
+## 3. get_route_detail — 路由入参/返回字段详情
+
+查询单个路由的完整入参与返回字段，并附通用传值格式指引；由大模型自行根据参数说明组织 `params` 调用 `query_data`（不提供调用模板，因实际查询参数千变万化，模板易误导）。
+
+### 参数
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|:----:|------|
+| `routeSlug` | string | ✅ | 路由标识，如 `"daily-stock"`，通过 `list_routes` 获取 |
+
+### 返回示例
+
+```
+【日K线数据】routeSlug: daily-stock
+说明：股票日线行情数据，包含开盘价、收盘价、最高价、最低价、成交量等
+分类：股票行情
+
+查询参数：
+  - tradeDate (date, 可选): 交易日期，格式 YYYY-MM-DD
+  - symbol (string, 可选): 股票代码，如 000001.SZ
+
+返回字段：
+  - tradeDate (string): 交易日期
+  - symbol (string): 股票代码
+  - close (number): 收盘价
+  ...
+
+通用传值格式（按参数 type）：
+- string：单值传字符串 "v"；多值传字符串数组 ["v1","v2"]，或逗号分隔字符串 "v1,v2,v3"（≤100 项）
+- number：单值传数字 1；多值传数字数组 [1,5,30]，或逗号分隔字符串 "1,5,30"（≤100 项）
+- date：单值传字符串 "2026-05-01"；范围传两元素数组 ["2026-05-01","2026-05-07"]（语义 >= AND <=）
+        支持格式：yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss
+
+请根据上述查询参数说明与通用传值格式，结合用户实际意图（例如指定的代码、时间范围等）：
+1. 自行判断需要传哪些参数（必填的务必带上，可选的按需）
+2. 按各参数对应的 type 选择正确的传值形式（单值 / 多值 / 范围）
+3. 调用 query_data(routeSlug, params) 获取数据
+注：pageSize 由 mcp.pageSize 配置控制，不要写入 params。
+```
+
+### 何时使用
+
+- `list_routes` 找到目标路由后，确认入参/返回字段
+- 不确定某个参数怎么传（单值/多值/范围）时
+
+---
+
+## 4. query_data — 查询数据
 
 查询指定路由的数据，结果以 **CSV 格式** 返回（节省 token）。
 
@@ -95,7 +139,7 @@ MCP Server 提供三个工具（Tool），AI 可以主动调用这些工具来�
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|:----:|------|
 | `routeSlug` | string | ✅ | 路由标识，如 `"daily-stock"`，通过 `list_routes` 获取 |
-| `params` | object | — | 查询参数，键值对透传给 API。具体参数参考 `list_routes` 返回的路由说明 |
+| `params` | object | — | 查询参数，键值对透传给 API。具体参数参考 `get_route_detail` 返回的路由说明 |
 
 `params` 的值支持以下类型：
 - `string` — 字符串参数（如股票代码）
@@ -130,7 +174,7 @@ tradeDate,symbol,open,high,low,close,volume
 
 **无数据：**
 ```
-未查询到符合条件的数据。请检查查询参数是否正确，可通过 list_routes 工具查看该路由支持的参数说明。
+未查询到符合条件的数据。请检查查询参数是否正确，可通过 get_route_detail 工具查看该路由支持的参数说明。
 ```
 
 **pageSize 超限：**
