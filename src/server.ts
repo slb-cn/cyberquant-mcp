@@ -8,6 +8,7 @@ import { registerConfigureTool } from './tools/configure.js';
 import { registerListRoutesTool } from './tools/list.js';
 import { registerGetRouteDetailTool } from './tools/detail.js';
 import { registerQueryDataTool } from './tools/query.js';
+import { registerConfigInfoTools } from './tools/config-info.js';
 import { createUserProfileResource } from './resources/user-profile.js';
 import { createRouteListResource } from './resources/route-list.js';
 
@@ -22,6 +23,7 @@ export function createServer(state: ServerState): McpServer {
   registerListRoutesTool(server, state);
   registerGetRouteDetailTool(server, state);
   registerQueryDataTool(server, state);
+  registerConfigInfoTools(server, state);
 
   // 注册 Resources
   createUserProfileResource(server, state);

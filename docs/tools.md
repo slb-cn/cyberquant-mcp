@@ -1,6 +1,6 @@
 # 工具说明（MCP Tools）
 
-MCP Server 提供四个工具（Tool），AI 可以主动调用这些工具来完成任务。
+MCP Server 提供六个工具（Tool），AI 可以主动调用这些工具来完成任务。
 
 典型调用流程：`configure`（首次） → `list_routes`（找路由） → `get_route_detail`（看入参/返回） → `query_data`（取数据）。
 
@@ -53,7 +53,7 @@ MCP Server 提供四个工具（Tool），AI 可以主动调用这些工具来�
 
 ### 调用接口
 
-`GET /api/v1/api-list`（结果在 MCP Server 内存缓存 2 分钟，list→detail 连贯调用零重复网络）
+`GET /api/v1/api-list`（结果按账号按日缓存到 `~/.cyberquant/cache/routes-<hash>.json`，当天重复调用优先读取本地缓存）
 
 ### 返回示例
 
@@ -193,3 +193,57 @@ AI 模型单次处理建议 **50-200 条记录**：
 - 默认 `pageSize = 200`，适合大多数分析场景
 - 超过 1000 条会被自动拦截
 - 大数据量任务建议使用 `cyberquant-cli` 配合脚本处理
+
+---
+
+## 5. get_routes_metadata — 路由完整元数据
+
+查询当前用户可访问的数据路由元数据列表，返回压缩 JSON。内容包含每个接口的 `routeSlug`、名称、说明、分类、市场类型、权限等级、查询参数 `queryParams` 与返回字段 `responseParams`，用于枚举可调用接口、选择 `routeSlug`，并理解各接口支持的筛选条件和返回字段定义。
+
+### 参数
+
+无参数。自动使用配置中的 API Key 获取对应用户权限下的路由元数据。
+
+### 调用接口
+
+`GET /api/v1/api-list`（结果按账号按日缓存到 `~/.cyberquant/cache/routes-<hash>.json`）
+
+### 返回示例
+
+```json
+[{"routeSlug":"daily-stock","displayName":"日K线数据","description":"股票日线行情数据","category":"股票行情","marketType":"stock","requiredTier":1,"queryParams":[{"name":"symbol","type":"string","required":false,"desc":"股票代码"}],"responseParams":[{"name":"tradeDate","type":"date","desc":"交易日期"}]}]
+```
+
+### 何时使用
+
+- 需要一次性获取当前用户可查询数据范围的完整 Schema 时
+- 需要程序化解析全部路由的查询参数和返回字段时
+- 客户端无法稳定读取 MCP Resources，但仍需要完整元数据时
+
+如果只是浏览有哪些数据，优先使用 `list_routes`；如果已确定具体 `routeSlug`，优先使用 `get_route_detail` 获取单路由详情以节省上下文。
+
+---
+
+## 6. get_user_profile — 用户账户与权限信息
+
+查询当前 API Key 对应用户的账户与权限信息，返回压缩 JSON。内容包含用户邮箱、订阅等级、可用市场、到期时间、账户是否有效以及速率限制配置。
+
+### 参数
+
+无参数。自动使用配置中的 API Key 获取当前用户信息。
+
+### 调用接口
+
+`GET /api/v1/me`
+
+### 返回示例
+
+```json
+{"email":"user@example.com","tier":{"level":2,"name":"专业版"},"markets":[{"code":"SH","name":"上海证券交易所"}],"expiresAt":"2025-12-31T23:59:59Z","isActive":true,"rateLimit":{"windowMs":60000,"maxRequests":120}}
+```
+
+### 何时使用
+
+- 需要了解当前 API Key 的订阅等级、市场权限或账户有效期时
+- 需要判断用户是否有权访问某类市场数据时
+- 客户端无法稳定读取 MCP Resources，但仍需要用户权限上下文时

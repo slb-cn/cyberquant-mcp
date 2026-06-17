@@ -50,7 +50,7 @@ function formatResponseParams(params: ResponseParam[]): string {
 export function registerGetRouteDetailTool(server: McpServer, state: ServerState): void {
   server.tool(
     'get_route_detail',
-    '查询指定路由的入参与返回字段详情。先用 list_routes 找到 routeSlug，再用本工具拿参数说明，最后由大模型根据说明自行组织 params 调用 query_data。',
+    '查询单个路由的入参与返回字段详情，并附带通用传值格式说明。',
     {
       routeSlug: z.string().describe('路由标识，如 "daily-stock"。通过 list_routes 获取可用 routeSlug。'),
     },

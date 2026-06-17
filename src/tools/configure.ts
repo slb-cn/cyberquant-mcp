@@ -11,9 +11,9 @@ import { ApiClient } from '../lib/api-client.js';
 export function registerConfigureTool(server: McpServer, state: ServerState): void {
   server.tool(
     'configure',
-    '配置 API Key 以访问数据服务。首次使用时必须调用此工具完成配置。endpoint 默认为 https://api.cyberspace2077.com。',
+    '配置 API Key 以访问数据服务。调用其他任何工具前必须先完成配置，否则会收到未配置提示。endpoint 默认 https://api.cyberspace2077.com，通常无需传入。',
     {
-      apiKey: z.string().describe('API Key，格式为 sk_live_xxx 或 sk_test_xxx'),
+      apiKey: z.string().describe('API Key，格式为 sk_live_xxx'),
       endpoint: z
         .string()
         .optional()

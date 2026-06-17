@@ -4,6 +4,19 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.3] - 2026-06-17
+
+### Added
+
+- 新增 `get_routes_metadata` 工具：返回当前用户可访问数据路由的完整压缩 JSON 元数据
+- 新增 `get_user_profile` 工具：返回当前 API Key 对应用户的账户与权限压缩 JSON 信息
+- 路由元数据新增按账号按日文件缓存 `~/.cyberquant/cache/routes-<hash>.json`
+
+### Changed
+
+- 移除路由列表 2 分钟进程内缓存，统一使用按日文件缓存
+- 精简 `configure`、`get_route_detail`、`list_routes`、`query_data` 工具的描述文案
+
 ## [0.1.2] - 2026-06-15
 
 ### Added
@@ -41,7 +54,3 @@
 - API Gateway HTTP 客户端：原生 fetch、429/503 自动重试（指数退避、尊重 Retry-After）、请求超时
 - 所有请求统一携带 `X-Client-Type: mcp` header
 - 与 `cyberquant-cli` 共用配置 `~/.cyberquant/config.json`，MCP 读取 `mcp` 字段
-
-[0.1.2]: https://github.com/slb-cn/cyberquant-mcp/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/slb-cn/cyberquant-mcp/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/slb-cn/cyberquant-mcp/releases/tag/v0.1.0

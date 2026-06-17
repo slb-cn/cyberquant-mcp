@@ -1,6 +1,6 @@
 # Resources 说明（MCP Resources）
 
-MCP Resources 是一种被动数据源，AI 客户端可以主动读取资源内容，无需调用工具。
+MCP Resources 是一种被动数据源，AI 客户端可以读取资源内容，无需调用工具。
 
 ## Resources vs Tools
 
@@ -20,7 +20,7 @@ MCP Resources 是一种被动数据源，AI 客户端可以主动读取资源内
 
 ## 1. cyberquant://user/profile
 
-当前登录用户的信息。
+当前登录用户的信息。若 MCP 客户端无法稳定读取 Resource，也可调用 `get_user_profile` 工具获取同等用户账户与权限信息。
 
 ### MIME 类型
 
@@ -73,7 +73,7 @@ MCP Resources 是一种被动数据源，AI 客户端可以主动读取资源内
 
 ### 更新策略
 
-每次 MCP 会话首次访问时从 API 获取并缓存。
+每次访问时从 API 获取最新用户信息，不做文件缓存。
 
 ### 何时使用
 
@@ -85,7 +85,7 @@ MCP Resources 是一种被动数据源，AI 客户端可以主动读取资源内
 
 ## 2. cyberquant://routes
 
-当前用户可用的数据路由列表。
+当前用户可用的数据路由列表。若 MCP 客户端无法稳定读取 Resource，也可调用 `get_routes_metadata` 工具获取同等完整路由元数据。
 
 ### MIME 类型
 
@@ -101,17 +101,17 @@ MCP Resources 是一种被动数据源，AI 客户端可以主动读取资源内
 
 ### 更新策略
 
-每次 MCP 会话首次访问时从 API 获取并缓存。
+路由元数据按账号按日缓存到 `~/.cyberquant/cache/routes-<hash>.json`。缓存文件修改时间晚于当天 00:00 时直接读取本地缓存；文件不存在、过期或损坏时重新调用 API 并刷新缓存。
 
 ### 与 list_routes / get_route_detail 工具的区别
 
-| 特性 | `cyberquant://routes` Resource | `list_routes` Tool | `get_route_detail` Tool |
-|------|------|------|------|
-| 数据来源 | 相同（`GET /api/v1/api-list`） | 相同 | 相同 |
-| 返回格式 | 原始 JSON（含入参/返回字段） | 格式化文本（仅目录） | 格式化文本（含单路由完整字段+传值格式指引） |
-| 用途 | 程序化读取完整 Schema | AI 浏览路由目录 | AI 取单个路由的详情后自行组织 query_data 参数 |
+| 特性 | `cyberquant://routes` Resource | `get_routes_metadata` Tool | `list_routes` Tool | `get_route_detail` Tool |
+|------|------|------|------|------|
+| 数据来源 | 相同（`GET /api/v1/api-list`） | 相同 | 相同 | 相同 |
+| 返回格式 | 原始 JSON（含入参/返回字段） | 压缩 JSON（含入参/返回字段） | 格式化文本（仅目录） | 格式化文本（含单路由完整字段+传值格式指引） |
+| 用途 | 程序化读取完整 Schema | 通过 Tool 获取完整 Schema | AI 浏览路由目录 | AI 取单个路由的详情后自行组织 query_data 参数 |
 
-Resource 返回原始 JSON 数据，适合程序化处理；两个 Tool 返回格式化的自然语言文本，按"先目录后详情"的顺序使用以节省上下文。
+Resource 与 `get_routes_metadata` 返回完整 JSON 数据，适合程序化处理；`list_routes` 与 `get_route_detail` 返回格式化的自然语言文本，按"先目录后详情"的顺序使用以节省上下文。
 
 ### 何时使用
 

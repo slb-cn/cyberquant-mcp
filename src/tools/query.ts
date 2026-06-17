@@ -48,7 +48,7 @@ const NO_DATA_HINT =
 export function registerQueryDataTool(server: McpServer, state: ServerState): void {
   server.tool(
     'query_data',
-    '查询指定路由的数据，返回 CSV 格式。先用 list_routes 找路由，再用 get_route_detail 获取入参/返回字段说明，最后调用本工具查询。',
+    '按参数查询指定路由的数据，返回 CSV 格式。需先用 `get_route_detail` 获取入参/返回字段说明，再据此组织 params 调用本工具。',
     {
       routeSlug: z.string().describe('路由标识，如 "daily-stock"。通过 list_routes 获取可用路由。'),
       params: z

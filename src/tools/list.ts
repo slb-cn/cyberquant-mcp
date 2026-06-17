@@ -27,7 +27,7 @@ const NEXT_STEP_HINT = [
 export function registerListRoutesTool(server: McpServer, state: ServerState): void {
   server.tool(
     'list_routes',
-    '列出当前用户可用的数据路由目录（仅含 routeSlug、名称、说明、分类，不含入参/返回字段）。如需入参/返回字段详情，请使用 get_route_detail 工具。',
+    '列出当前用户可用的数据路由目录（轻量，仅 routeSlug、名称、说明、分类，不含入参/返回字段）。',
     {},
     async () => {
       if (!state.client) {
