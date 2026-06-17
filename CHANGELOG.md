@@ -4,6 +4,12 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.4] - 2026-06-17
+
+### Fixed
+
+- 修正 `get_routes_metadata` 工具描述：由「标准JSON格式」改为「压缩 JSON」，与文档及实际输出一致
+
 ## [0.1.3] - 2026-06-17
 
 ### Added
@@ -54,3 +60,5 @@
 - API Gateway HTTP 客户端：原生 fetch、429/503 自动重试（指数退避、尊重 Retry-After）、请求超时
 - 所有请求统一携带 `X-Client-Type: mcp` header
 - 与 `cyberquant-cli` 共用配置 `~/.cyberquant/config.json`，MCP 读取 `mcp` 字段
+
+[0.1.4]: https://github.com/slb-cn/cyberquant-mcp/compare/v0.1.3...v0.1.4

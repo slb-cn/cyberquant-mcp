@@ -9,7 +9,7 @@ import { NO_CONFIG_HINT } from '../lib/state.js';
 export function registerConfigInfoTools(server: McpServer, state: ServerState): void {
   server.tool(
     'get_routes_metadata',
-    '一次性返回所有路由的完整元数据（标准JSON格式，含 routeSlug、名称、说明、分类、市场类型、权限等级、queryParams、responseParams）。token 开销较大，仅当需要一次性拿到全部接口的完整字段定义、构建完整索引时使用。',
+    '一次性返回所有路由的完整元数据（压缩 JSON，含 routeSlug、名称、说明、分类、市场类型、权限等级、queryParams、responseParams）。token 开销较大，仅当需要一次性拿到全部接口的完整字段定义、构建完整索引时使用。',
     {},
     async () => {
       if (!state.client) {
