@@ -79,22 +79,39 @@ export function loadConfig(): AppConfig | null {
   return buildConfig(raw);
 }
 
-/** 保存配置并返回 AppConfig（用于 configure tool） */
-export function saveConfig(apiKey: string, endpoint?: string): AppConfig {
-  const config: RawConfig = {
-    endpoint: (endpoint ?? DEFAULT_ENDPOINT).replace(/\/+$/, ''),
-    apiKey,
-    mcp: { ...MCP_DEFAULTS },
+/** 保存配置并返回 AppConfig（用于 configure tool）
+ *  合并语义：本次入参 > 配置文件现有值 > 默认值；保留配置文件中的其它字段（如 CLI 的 maxTerminalRecords）。
+ *  apiKey 可选——省略时取配置文件现有值；两者皆无（首次未配置）则抛错，由工具层提示。 */
+export function saveConfig(apiKey?: string, endpoint?: string, pageSize?: number): AppConfig {
+  // 读取现有配置，保留 CLI 同级字段与已设的 apiKey/mcp.timeout
+  const existing: RawConfig = readRawConfig() ?? {};
+
+  // apiKey：本次入参 > 配置文件现有值；两者皆无则无法完成配置
+  const finalApiKey = apiKey ?? existing.apiKey;
+  if (!finalApiKey) {
+    throw new Error('缺少 API Key：配置文件尚未配置 apiKey 且本次未传入，首次配置请提供 apiKey。');
+  }
+
+  const endpointValue = (endpoint ?? existing.endpoint ?? DEFAULT_ENDPOINT).replace(/\/+$/, '');
+  const mcp: McpConfig = {
+    pageSize: pageSize ?? existing.mcp?.pageSize ?? MCP_DEFAULTS.pageSize,
+    timeout: existing.mcp?.timeout ?? MCP_DEFAULTS.timeout,
   };
+
+  // 保留 existing 中的其它字段，仅覆盖 endpoint/apiKey/mcp
+  const config: RawConfig = { ...existing, endpoint: endpointValue, apiKey: finalApiKey, mcp };
 
   if (!fs.existsSync(CONFIG_DIR)) {
     fs.mkdirSync(CONFIG_DIR, { recursive: true });
   }
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
 
-  return {
-    endpoint: config.endpoint!,
-    apiKey: config.apiKey,
-    mcp: { ...MCP_DEFAULTS },
-  };
+  // 入参 pageSize 已由工具层 zod 限制在 1~1000，此处仅可能因保留现有值而超限，与 buildConfig 行为一致
+  if (mcp.pageSize > PAGE_SIZE_MAX) {
+    process.stderr.write(
+      `[cyberquant-mcp] 警告：mcp.pageSize=${mcp.pageSize} 超过上限 ${PAGE_SIZE_MAX}，查询时将返回警告提示\n`,
+    );
+  }
+
+  return { endpoint: endpointValue, apiKey: finalApiKey, mcp };
 }

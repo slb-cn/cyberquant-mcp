@@ -52,9 +52,12 @@ CyberQuant MCP Server 使用配置文件管理 API 连接信息和查询参数�
 AI：（调用 configure 工具）
      apiKey: sk_live_abc123def456
      endpoint: https://api.cyberspace2077.com
+     pageSize: 200
 ```
 
-调用后 MCP Server 会自动创建/更新配置文件，无需手动编辑。
+调用后 MCP Server 会自动创建/更新配置文件，无需手动编辑。`apiKey`、`endpoint` 与 `pageSize` 均可省略：**传入则覆盖，省略则保留配置文件中的现有值**（仅当现有值也缺失时才用默认值）。其中 `apiKey` 仅首次配置必填——后续反复调用调整 `endpoint`/`pageSize` 时可省略，将保留现有 Key，不会重置此前设好的 `pageSize`。
+
+> 💡 若不确定是否已配置，可**不传任何参数**调用 `configure` 查询当前配置状态（只读，返回是否已配置、`endpoint`、`pageSize`，不回显密钥、不写文件），再决定是否需要提供 `apiKey`。
 
 ### 方式二：手动编辑配置文件
 

@@ -4,6 +4,18 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.5] - 2026-06-22
+
+### Added
+
+- `configure` 工具新增 `pageSize` 参数（1~1000，超出会被拒绝），可在对话中调整单次查询返回条数
+- `configure` 工具的 `apiKey` 改为可选：配置文件已有 apiKey 时可省略，便于反复调用调整 `endpoint`/`pageSize` 而无需重填密钥（仅首次配置必填）
+- `configure` 工具支持零参查询配置状态：不传任何参数时只读返回是否已配置、`endpoint`、`pageSize`（不回显密钥、不写文件），并在工具描述中写明配置文件路径 `~/.cyberquant/config.json`，便于大模型主动感知配置状态
+
+### Fixed
+
+- `saveConfig` 改为读取-合并-写入：传入参数覆盖原值，省略参数保留配置文件现有值（仅当现有值也缺失时才回落默认值），并保留 CLI 同级字段。修复此前重新调用 `configure` 刷新 API Key 会静默重置 `mcp.pageSize`/`mcp.timeout` 的问题
+
 ## [0.1.4] - 2026-06-17
 
 ### Fixed
@@ -61,4 +73,4 @@
 - 所有请求统一携带 `X-Client-Type: mcp` header
 - 与 `cyberquant-cli` 共用配置 `~/.cyberquant/config.json`，MCP 读取 `mcp` 字段
 
-[0.1.4]: https://github.com/slb-cn/cyberquant-mcp/compare/v0.1.3...v0.1.4
+[0.1.5]: https://github.com/slb-cn/cyberquant-mcp/compare/v0.1.4...v0.1.5

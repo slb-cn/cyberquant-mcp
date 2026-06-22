@@ -78,7 +78,7 @@ MCP Server 与 `cyberquant-cli` 共用配置文件 `~/.cyberquant/config.json`�
 }
 ```
 
-> 💡 也可不手动编辑文件——启动后在对话中直接说"请配置我的 API Key"，AI 会调用 `configure` 工具完成配置。
+> 💡 也可不手动编辑文件——启动后在对话中直接说"请配置我的 API Key"，AI 会调用 `configure` 工具完成配置；`pageSize` 同样可在对话中通过 `configure` 设置（省略则保留现有值）。
 
 完整字段说明见 [配置文档](./docs/configuration.md)。
 

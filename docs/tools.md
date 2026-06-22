@@ -8,26 +8,49 @@ MCP Server 提供六个工具（Tool），AI 可以主动调用这些工具来�
 
 ## 1. configure — 配置 API Key
 
-首次使用时必须调用此工具完成 API Key 配置。
+首次使用时必须调用此工具完成 API Key 配置。该工具有两种模式：**不传任何参数** = 只读查询当前配置状态；**传入任意参数** = 写入配置。
 
 ### 参数
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|:----:|------|
-| `apiKey` | string | ✅ | API Key，格式为 `sk_live_xxx` 或 `sk_test_xxx` |
+| `apiKey` | string | 首次 | API Key，格式为 `sk_live_xxx` 或 `sk_test_xxx`。配置文件已有 apiKey 时可省略，保留现有值 |
 | `endpoint` | string | — | API Gateway 地址，默认 `https://api.cyberspace2077.com` |
+| `pageSize` | number | — | 单次查询返回条数，默认 `200`，上限 `1000`（超出会被拒绝）。省略则保留现有配置值 |
 
-### 行为
+### 查询配置状态（零参调用）
 
-1. 将配置写入 `~/.cyberquant/config.json`
-2. 自动补全 `mcp` 子字段的默认值（pageSize=200, timeout=30000）
-3. **立即生效**：更新共享状态，后续所有工具调用直接使用新配置，无需重启
+不传任何参数时为只读查询，返回当前运行态配置（与各数据工具实际使用一致），**不写文件、不回显 apiKey 值**：
+
+**已配置时：**
+```
+当前配置状态（读取自内存，与各数据工具实际使用一致）：
+- 配置文件：~/.cyberquant/config.json
+- API Key：已配置
+- endpoint：https://api.cyberspace2077.com
+- pageSize：200
+- timeout：30000ms
+```
+
+**未配置时：**
+```
+当前配置状态（读取自内存，与各数据工具实际使用一致）：
+- 配置文件：~/.cyberquant/config.json
+- API Key：未配置
+```
+
+> 💡 大模型在不确定是否已配置时，可先零参调用本工具探活，再决定是否需要传入 `apiKey`。
+
+### 写入行为（传入任意参数时）
+
+1. 将配置写入 `~/.cyberquant/config.json`（**按入参合并覆盖**：传入的参数覆盖原值，省略的参数保留原值，仅当原值也缺失时才回落默认值；同时保留 CLI 的 `pageSize`、`maxTerminalRecords` 等同级字段不被破坏）
+2. **立即生效**：更新共享状态，后续所有工具调用直接使用新配置，无需重启
 
 ### 返回示例
 
 **成功：**
 ```
-配置成功！endpoint: https://api.cyberspace2077.com，现在可以使用 list_routes 查看可用数据路由，或使用 query_data 查询数据。
+配置成功！endpoint: https://api.cyberspace2077.com，pageSize: 200，现在可以使用 list_routes 查看可用数据路由，或使用 query_data 查询数据。
 ```
 
 **失败：**
@@ -40,6 +63,7 @@ MCP Server 提供六个工具（Tool），AI 可以主动调用这些工具来�
 - 首次启动 MCP Server 时（无配置文件）
 - 需要更换 API Key 时
 - 需要切换环境（如从测试环境切换到生产环境）时
+- 需要调整单次查询返回条数（`pageSize`）时
 
 ---
 
