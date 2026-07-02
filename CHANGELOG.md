@@ -4,6 +4,17 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.6] - 2026-07-02
+
+### Fixed
+
+- MCP Server 上报的版本号此前硬编码为 `0.1.0`，与 `package.json` 实际版本长期不一致；现改为运行时从 `package.json` 读取（`createRequire` 加载），避免再次漂移
+- 补全缺失的 `@types/node` 开发依赖：此前整个项目 `tsc` 类型检查报 `Cannot find module 'node:xxx'` / `Cannot find name 'process'` 等（不影响 tsup 构建，但 IDE 满屏红波浪线、类型检查形同虚设），现已修复
+
+### Added
+
+- 新增 `LICENSE`（MIT）文件，并在 `package.json` 声明 `"license": "MIT"`
+
 ## [0.1.5] - 2026-06-22
 
 ### Added
@@ -73,4 +84,4 @@
 - 所有请求统一携带 `X-Client-Type: mcp` header
 - 与 `cyberquant-cli` 共用配置 `~/.cyberquant/config.json`，MCP 读取 `mcp` 字段
 
-[0.1.5]: https://github.com/slb-cn/cyberquant-mcp/compare/v0.1.4...v0.1.5
+[0.1.6]: https://github.com/slb-cn/cyberquant-mcp/compare/v0.1.5...v0.1.6
