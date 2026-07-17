@@ -1,6 +1,6 @@
 # 工具说明（MCP Tools）
 
-MCP Server 提供六个工具（Tool），AI 可以主动调用这些工具来完成任务。
+MCP Server 提供七个工具（Tool），AI 可以主动调用这些工具来完成任务。
 
 典型调用流程：`configure`（首次） → `list_routes`（找路由） → `get_route_detail`（看入参/返回） → `query_data`（取数据）。
 
@@ -77,7 +77,7 @@ MCP Server 提供六个工具（Tool），AI 可以主动调用这些工具来�
 
 ### 调用接口
 
-`GET /api/v1/api-list`（结果按账号按日缓存到 `~/.cyberquant/cache/routes-<hash>.json`，当天重复调用优先读取本地缓存）
+`GET /api/v1/api-list`（结果按账号按日缓存到 `~/.cyberquant/cache/routes-<hash>.json`，当天重复调用优先读取本地缓存；如需当日强制刷新可调用 `clear_routes_cache` 工具清除缓存）
 
 ### 返回示例
 
@@ -230,7 +230,7 @@ AI 模型单次处理建议 **50-200 条记录**：
 
 ### 调用接口
 
-`GET /api/v1/api-list`（结果按账号按日缓存到 `~/.cyberquant/cache/routes-<hash>.json`）
+`GET /api/v1/api-list`（结果按账号按日缓存到 `~/.cyberquant/cache/routes-<hash>.json`；可用 `clear_routes_cache` 工具主动清除）
 
 ### 返回示例
 
@@ -271,3 +271,39 @@ AI 模型单次处理建议 **50-200 条记录**：
 - 需要了解当前 API Key 的订阅等级、市场权限或账户有效期时
 - 需要判断用户是否有权访问某类市场数据时
 - 客户端无法稳定读取 MCP Resources，但仍需要用户权限上下文时
+
+---
+
+## 7. clear_routes_cache — 清除路由元数据缓存
+
+清除本地路由元数据按日缓存文件 `~/.cyberquant/cache/routes-<hash>.json`。删除后，下次调用 `list_routes`、`get_routes_metadata` 或 `get_route_detail` 会从 API 重新拉取并重建当日缓存。
+
+路由元数据按账号按日缓存（以文件 mtime 判断当日有效），正常情况下次日自动失效。当用户**当日**权限或可访问路由发生变动、而当日缓存尚未过期时，调用本工具强制刷新。
+
+### 参数
+
+无参数。清空目录下所有账号的路由元数据缓存文件（该目录仅存放按日 JSON 缓存）。不发起任何网络请求，不修改 `~/.cyberquant/config.json`。
+
+### 行为
+
+- 删除 `~/.cyberquant/cache/` 下所有 `routes-<hash>.json` 文件
+- 返回已清除的缓存文件数量
+- 不发起网络请求，不影响已配置的 API Key
+
+### 返回示例
+
+**已清除缓存：**
+```
+已清除 1 个路由元数据缓存文件。下次调用 list_routes / get_routes_metadata / get_route_detail 时会从 API 重新拉取并重建当日缓存。
+```
+
+**目录为空：**
+```
+缓存目录为空，没有需要清理的路由元数据缓存。下次调用 list_routes / get_routes_metadata / get_route_detail 时会从 API 重新拉取并重建当日缓存。
+```
+
+### 何时使用
+
+- 用户当日权限/订阅等级变动后，路由列表未及时更新
+- 怀疑本地路由元数据缓存与线上不一致，需要强制刷新当日缓存
+- 故障排查时清除可能损坏的缓存文件

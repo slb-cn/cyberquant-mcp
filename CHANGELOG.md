@@ -4,6 +4,12 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.7] - 2026-07-17
+
+### Added
+
+- 新增 `clear_routes_cache` 工具：清除本地路由元数据按日缓存 `~/.cyberquant/cache/routes-<hash>.json`，解决用户当日权限/可访问路由变动后、当日缓存未自动刷新需手动强制刷新的场景
+
 ## [0.1.6] - 2026-07-02
 
 ### Fixed
@@ -85,3 +91,4 @@
 - 与 `cyberquant-cli` 共用配置 `~/.cyberquant/config.json`，MCP 读取 `mcp` 字段
 
 [0.1.6]: https://github.com/slb-cn/cyberquant-mcp/compare/v0.1.5...v0.1.6
+[0.1.7]: https://github.com/slb-cn/cyberquant-mcp/compare/v0.1.6...v0.1.7

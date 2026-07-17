@@ -32,7 +32,8 @@ cyberquant-mcp/
 │   │   ├── configure.ts      # configure — 配置 API Key
 │   │   ├── list.ts           # list_routes — 路由目录（仅元信息）
 │   │   ├── detail.ts         # get_route_detail — 单路由入参/返回字段详情
-│   │   └── query.ts          # query_data — CSV 数据查询
+│   │   ├── query.ts          # query_data — CSV 数据查询
+│   │   └── clear-routes-cache.ts # clear_routes_cache — 清除路由元数据缓存
 │   ├── resources/
 │   │   ├── user-profile.ts   # cyberquant://user/profile
 │   │   └── route-list.ts     # cyberquant://routes
@@ -67,7 +68,7 @@ cyberquant-mcp/
 
 ### 版本管理
 
-版本号维护在 `package.json` 的 `version` 字段（当前 `0.1.0`）。
+版本号维护在 `package.json` 的 `version` 字段（当前 `0.1.7`）。
 
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)（SemVer）：`主版本.次版本.修订号`，变更记录维护在 [CHANGELOG.md](./CHANGELOG.md)。
 

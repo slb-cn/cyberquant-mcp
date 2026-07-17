@@ -38,6 +38,7 @@ src/
 ├── server.ts             # MCP 服务器（注册 Tools + Resources）
 ├── tools/query.ts        # query_data — CSV 数据查询
 ├── tools/list.ts         # list_routes — 路由列表
+├── tools/clear-routes-cache.ts  # clear_routes_cache — 清除路由元数据缓存
 ├── resources/            # user-profile / routes
 ├── lib/api-client.ts     # API Gateway HTTP 客户端（含重试+超时）
 ├── lib/config.ts         # 配置管理

@@ -101,7 +101,7 @@ MCP Resources 是一种被动数据源，AI 客户端可以读取资源内容，
 
 ### 更新策略
 
-路由元数据按账号按日缓存到 `~/.cyberquant/cache/routes-<hash>.json`。缓存文件修改时间晚于当天 00:00 时直接读取本地缓存；文件不存在、过期或损坏时重新调用 API 并刷新缓存。
+路由元数据按账号按日缓存到 `~/.cyberquant/cache/routes-<hash>.json`。缓存文件修改时间晚于当天 00:00 时直接读取本地缓存；文件不存在、过期或损坏时重新调用 API 并刷新缓存。如需当日主动刷新（如权限变动后当日缓存未更新），可调用 `clear_routes_cache` 工具清除缓存文件。
 
 ### 与 list_routes / get_route_detail 工具的区别
 

@@ -10,7 +10,7 @@ CyberQuant 数据共享平台的 MCP（Model Context Protocol）服务器，让 
 
 ## 功能特性
 
-### MCP Tools（6 个）
+### MCP Tools（7 个）
 
 | 工具 | 说明 |
 |------|------|
@@ -20,6 +20,7 @@ CyberQuant 数据共享平台的 MCP（Model Context Protocol）服务器，让 
 | `query_data` | 查询指定数据路由的数据，返回 **CSV 格式**（节省 token） |
 | `get_routes_metadata` | 查询当前用户可访问的数据路由元数据列表，返回压缩 JSON |
 | `get_user_profile` | 查询当前 API Key 对应用户的账户与权限信息，返回压缩 JSON |
+| `clear_routes_cache` | 清除本地路由元数据按日缓存，当日权限/路由变动后强制下次查询重新拉取最新元数据 |
 
 ### MCP Resources（2 个）
 

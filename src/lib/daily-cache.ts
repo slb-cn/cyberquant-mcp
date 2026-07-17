@@ -58,6 +58,29 @@ export function readDailyJsonCache<T>(
   }
 }
 
+/** 清空目录下所有按日 JSON 缓存文件（当前为 routes-<hash>.json），返回删除文件数。
+ *
+ * 与 pruneStaleCache 同样按 .json 后缀判断（目录仅存放按日 JSON 缓存）；
+ * 写入用的 .tmp 临时文件后缀不同，不会被误删。单文件删除失败不影响其余清理。
+ */
+export function clearAllDailyJsonCache(): number {
+  let deleted = 0;
+  try {
+    for (const name of fs.readdirSync(CACHE_DIR)) {
+      if (!name.endsWith('.json')) continue;
+      try {
+        fs.unlinkSync(path.join(CACHE_DIR, name));
+        deleted++;
+      } catch {
+        // 单个文件删除失败（如并发删除），跳过该文件
+      }
+    }
+  } catch {
+    // 目录不存在或读失败，视为无可清理缓存
+  }
+  return deleted;
+}
+
 /** 写入 JSON 缓存，并顺手清理当日已过期的旧缓存；缓存失败不影响主流程 */
 export function writeDailyJsonCache(fileName: string, value: unknown): void {
   try {
